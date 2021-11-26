@@ -10,10 +10,15 @@ pub fn main() !void {
         var innerIterator = std.mem.split(u8, input, "\n");
         while (innerIterator.next()) |innerLine| {
             const innerUInt = try std.fmt.parseUnsigned(u16, innerLine, 10);
-            if (outerUInt + innerUInt == 2020) {
-                std.debug.print("Number 1: {d}\n", .{outerUInt});
-                std.debug.print("Number 2: {d}\n", .{innerUInt});
-                return;
+            var innerInnerIterator = std.mem.split(u8, input, "\n");
+            while (innerInnerIterator.next()) |innerInnerLine| {
+                const innerInnerUInt = try std.fmt.parseUnsigned(u16, innerInnerLine, 10);
+                if (outerUInt + innerUInt + innerInnerUInt == 2020) {
+                    std.debug.print("Number 1: {d}\n", .{outerUInt});
+                    std.debug.print("Number 2: {d}\n", .{innerUInt});
+                    std.debug.print("Number 3: {d}\n", .{innerInnerUInt});
+                    return;
+                }
             }
         }
     }
