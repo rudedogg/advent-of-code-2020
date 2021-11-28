@@ -43,34 +43,34 @@ fn calculateCollisions(slope: Slope) !u32 {
     var collisions: u32 = 0;
     var lineIterator = std.mem.split(u8, input, "\n");
     var lineLength = std.mem.indexOf(u8, input, "\n").?;
-    var lineNumber: u64 = 0;
+    var lineNumber: u64 = 1;
     var currentX: u16 = slope.x;
     var currentY: u16 = slope.y;
 
     // Skip the first line, since it's the starting point
-    if (slope.y == 1 and lineNumber == 0) {
+    if (slope.y != 0) {
         _ = lineIterator.next();
     }
 
     while (lineIterator.next()) |line| {
         const wrappedX: u64 = currentX % lineLength;
-        std.debug.print("wrappedX: {d}\n", .{wrappedX});
+        // std.debug.print("wrappedX: {d}\n", .{wrappedX});
 
         if (lineNumber % slope.y == 0) {
             // Need to check this line, since our slope will hit it.
-            std.debug.print("Checking line: {d}\n", .{lineNumber});
-            std.debug.print("Line: {s}\n", .{line});
-            std.debug.print("Checking character: {u}\n", .{line[wrappedX]});
-            std.debug.print("------------------\n", .{});
+            // std.debug.print("Checking line: {d}\n", .{lineNumber});
+            // std.debug.print("Line: {s}\n", .{line});
+            // std.debug.print("Checking character: {u}\n", .{line[wrappedX]});
+            // std.debug.print("------------------\n", .{});
             if (line[wrappedX] == "#"[0]) {
                 collisions += 1;
             }
+            // Move the sleigh by the slope specified
+            currentX += slope.x;
+            currentY += slope.y;
         }
-        lineNumber += 1;
 
-        // Move the sleigh by the slope specified
-        currentX += slope.x;
-        currentY += slope.y;
+        lineNumber += 1;
     }
     std.debug.print("Line Length: {d}\n", .{lineLength});
 
