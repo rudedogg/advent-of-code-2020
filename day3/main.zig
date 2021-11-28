@@ -9,8 +9,8 @@ const Slope = struct {
 
 pub fn main() !void {
     std.debug.print("Hello day {d}\n", .{3});
-    try part1();
-    // try part2();
+    // try part1();
+    try part2();
 }
 
 fn part1() !void {
@@ -18,10 +18,26 @@ fn part1() !void {
     std.debug.print("Collisions: {d}\n", .{collisions});
 }
 
-// fn part2() !void {
-//     const collisions = try calculateCollisions(Slope{ .x = 3, .y = 1 });
-//     std.debug.print("Collisions: {d}\n", .{collisions});
-// }
+fn part2() !void {
+    const slope1 = Slope{ .x = 1, .y = 1 };
+    const collisions1 = try calculateCollisions(slope1);
+
+    const slope2 = Slope{ .x = 3, .y = 1 };
+    const collisions2 = try calculateCollisions(slope2);
+
+    const slope3 = Slope{ .x = 5, .y = 1 };
+    const collisions3 = try calculateCollisions(slope3);
+
+    const slope4 = Slope{ .x = 7, .y = 1 };
+    const collisions4 = try calculateCollisions(slope4);
+
+    const slope5 = Slope{ .x = 1, .y = 2 };
+    const collisions5 = try calculateCollisions(slope5);
+
+    const totalCollisions = collisions1 * collisions2 * collisions3 * collisions4 * collisions5;
+
+    std.debug.print("Part 2 Answer: {d}\n", .{totalCollisions});
+}
 
 fn calculateCollisions(slope: Slope) !u32 {
     var collisions: u32 = 0;
@@ -58,5 +74,6 @@ fn calculateCollisions(slope: Slope) !u32 {
     }
     std.debug.print("Line Length: {d}\n", .{lineLength});
 
+    std.debug.print("Slope: x={d}, y={d} | Collisions: {d}\n", .{ slope.x, slope.y, collisions });
     return collisions;
 }
