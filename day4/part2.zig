@@ -4,7 +4,7 @@ const input = @embedFile("input.txt");
 
 const Passport = struct {
     // byr: bool = true,
-    byr: []u8 = "",
+    byr: []const u8 = "",
     iyr: bool = false,
     eyr: bool = false,
     hgt: bool = false,
@@ -29,7 +29,7 @@ pub fn main() !void {
 }
 
 fn part2() !void {
-    // const fieldNames = [_]u8{"byr", "iyr", "eyr", "hgt", "hcl", "ecl", "pid", "cid"};
+    const fieldNames = [_][]const u8{ "byr", "iyr", "eyr", "hgt", "hcl", "ecl", "pid", "cid" };
 
     var validPassportCount: u16 = 0;
 
@@ -39,15 +39,17 @@ fn part2() !void {
         std.debug.print("--------------------\n", .{});
         std.debug.print("Passport: \n", .{});
         var lineIterator = std.mem.split(u8, passport, "\n");
-        while (lineIterator.next()) |line| {
-            // for (fields) |field| {
-            //     std.debug.print("{s}\n", .{field});
-            // }
 
+        while (lineIterator.next()) |line| {
+            for (fieldNames) |fieldName| {
+                const fieldContents = parseField(fieldName, line);
+                // @field(currentPassport, "byr") = "Aa";
+                std.debug.print("{s}\n", .{fieldContents});
+            }
             std.debug.print("{s}\n", .{line});
             // currentPassport.byr = currentPassport.byr or std.mem.indexOf(u8, line, "byr") != null;
             // currentPassport.byr = currentPassport.byr or std.mem.containsAtLeast(u8, line, 1, "byr");
-            currentPassport.byr = "";
+
             currentPassport.iyr = currentPassport.iyr or std.mem.indexOf(u8, line, "iyr") != null;
             currentPassport.eyr = currentPassport.eyr or std.mem.indexOf(u8, line, "eyr") != null;
             currentPassport.hgt = currentPassport.hgt or std.mem.indexOf(u8, line, "hgt") != null;
@@ -64,4 +66,35 @@ fn part2() !void {
         std.debug.print("--------------------\n\n", .{});
     }
     std.debug.print("Valid Passports: {d}\n\n", .{validPassportCount});
+}
+
+fn parseField(name: []const u8, haystack: []const u8) ?[]const u8 {
+    var fieldValue: ?[]const u8 = null;
+
+    var fieldIterator = std.mem.split(u8, haystack, " ");
+    while (fieldIterator.next()) |field| {
+        const fieldDelimeterIndex = std.mem.indexOf(u8, haystack, ":").? + 1;
+        // TODO: Why doesn't this work? // if (field[0..fieldDelimeterIndex] == name) {
+        if (std.mem.eql(u8, field[0..fieldDelimeterIndex], name)) {
+            fieldValue = field[fieldDelimeterIndex..];
+        }
+        std.debug.print("Field Value: {s}\n", .{fieldValue});
+    }
+
+    const fieldStartIndex = std.mem.indexOf(u8, haystack, name);
+    const fieldEndIndex = std.mem.lastIndexOf(u8, haystack, " ") orelse std.mem.indexOf(u8, haystack, "\n");
+    std.debug.print("Parsing line: {s}\n", .{haystack});
+    std.debug.print("Parsing fieldName: {s}\n", .{name});
+    std.debug.print("fieldStartIndex: {d}\n", .{fieldStartIndex});
+    std.debug.print("fieldEndIndex: {d}\n", .{fieldEndIndex});
+    if (fieldStartIndex == null or fieldEndIndex == null) {
+        return null;
+    }
+    // return haystack[fieldStartIndex.?..fieldEndIndex.?];
+    return fieldValue;
+    // var lineIterator = std.mem.split(u8, haystack, "\n");
+
+    // while (lineIterator.next()) |line| {
+    //     return name + line;
+    // }
 }
