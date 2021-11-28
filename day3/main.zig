@@ -62,7 +62,7 @@ fn calculateCollisions(slope: Slope) !u32 {
             // std.debug.print("Line: {s}\n", .{line});
             // std.debug.print("Checking character: {u}\n", .{line[wrappedX]});
             // std.debug.print("------------------\n", .{});
-            if (line[wrappedX] == "#"[0]) {
+            if (line[wrappedX] == '#') {
                 collisions += 1;
             }
             // Move the sleigh by the slope specified
