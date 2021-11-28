@@ -26,9 +26,9 @@ fn part1() !void {
 fn calculateCollisions(slope: Slope) !u32 {
     var collisions: u32 = 0;
     var lineIterator = std.mem.split(u8, input, "\n");
-    var lineLength: u64 = 0;
+    var lineLength = std.mem.indexOf(u8, input, "\n").?;
     var lineNumber: u64 = 0;
-    var currentX: u16 = (slope.x);
+    var currentX: u16 = slope.x;
     var currentY: u16 = slope.y;
 
     // Skip the first line, since it's the starting point
@@ -37,11 +37,6 @@ fn calculateCollisions(slope: Slope) !u32 {
     }
 
     while (lineIterator.next()) |line| {
-        // Calculate the line length if we haven't already
-        if (lineLength == 0) {
-            lineLength = std.mem.len(line);
-        }
-
         const wrappedX: u64 = currentX % lineLength;
         std.debug.print("wrappedX: {d}\n", .{wrappedX});
 
@@ -60,16 +55,6 @@ fn calculateCollisions(slope: Slope) !u32 {
         // Move the sleigh by the slope specified
         currentX += slope.x;
         currentY += slope.y;
-
-        // const firstSpace = std.mem.indexOf(u8, line, " ");
-        // const firstSpace = std.mem.indexOf(u8, line, " ");
-        // const firstDash = std.mem.indexOf(u8, line, "-");
-        // const colon = std.mem.indexOf(u8, line, ":");
-
-        // const firstCharacterSlotIndex = line[0..firstDash.?];
-        // const lastChacterSlotIndex = line[(firstDash.? + 1)..firstSpace.?];
-        // const firstCharacterSlotIndexInt = try std.fmt.parseUnsigned(u8, firstCharacterSlotIndex, 10);
-        // const lastCharacterSlotIndexInt = try std.fmt.parseUnsigned(u8, lastChacterSlotIndex, 10);
     }
     std.debug.print("Line Length: {d}\n", .{lineLength});
 
