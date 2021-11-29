@@ -23,8 +23,6 @@ const Passport = struct {
         return (byr >= 1920) and (byr <= 2002);
     }
     fn iyrValid(self: *Passport) bool {
-        std.debug.print("HI{s}\n\n\n\n", .{self});
-        // return true;
         const iyr: u16 = std.fmt.parseUnsigned(u16, self.iyr, 10) catch {
             return false;
         };
@@ -41,7 +39,6 @@ const Passport = struct {
         var height: ?u16 = null;
         var isCM = (std.mem.indexOf(u8, self.hgt, "cm") != null);
         std.debug.print("isCM: {b}\n", .{isCM});
-        std.debug.print("HI\n\n\n\n", .{});
 
         if (std.mem.indexOf(u8, self.hgt, "cm")) |cmIndex| {
             height = std.fmt.parseUnsigned(u16, self.hgt[0..cmIndex], 10) catch {
@@ -68,12 +65,15 @@ const Passport = struct {
 
     fn hclValid(self: *Passport) bool {
         if (std.mem.len(self.hcl) != 7) {
+            std.debug.print("invalid {s}\n\n\n\n", .{self.hcl});
             return false;
         }
         if (self.hcl[0] == '#') {
             for (self.hcl[1..7]) |char| {
                 var local = [1]u8{char};
                 if (std.mem.containsAtLeast(u8, "abcdef0123456789", 1, &local) == false) {
+                    std.debug.print("invalid {s}\n\n\n\n", .{&local});
+
                     return false;
                 }
             }
@@ -97,8 +97,6 @@ pub fn main() !void {
 }
 
 fn part2() !void {
-    // const fieldNames = [_][]const u8{ "byr", "iyr", "eyr", "hgt", "hcl", "ecl", "pid", "cid" };
-
     var validPassportCount: u16 = 0;
 
     var passportIterator = std.mem.split(u8, input, "\n\n");
