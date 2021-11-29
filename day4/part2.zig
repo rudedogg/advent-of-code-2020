@@ -84,7 +84,7 @@ const Passport = struct {
     }
 
     fn eclValid(self: *Passport) bool {
-        return std.mem.eql(u8, self.ecl, "amb") or std.mem.eql(u8, self.ecl, "blu") or std.mem.eql(u8, self.ecl, "gry") or std.mem.eql(u8, self.ecl, "grn") or std.mem.eql(u8, self.ecl, "hzl") or std.mem.eql(u8, self.ecl, "oth");
+        return std.mem.eql(u8, self.ecl, "amb") or std.mem.eql(u8, self.ecl, "blu") or std.mem.eql(u8, self.ecl, "brn") or std.mem.eql(u8, self.ecl, "gry") or std.mem.eql(u8, self.ecl, "grn") or std.mem.eql(u8, self.ecl, "hzl") or std.mem.eql(u8, self.ecl, "oth");
     }
 
     fn pidValid(self: *Passport) bool {
