@@ -14,26 +14,27 @@ const Passport = struct {
 
     fn isValid(self: *Passport) bool {
         return byrValid(self) and iyrValid(self) and eyrValid(self) and hgtValid(self) and hclValid(self) and eclValid(self) and pidValid(self);
-        // return hgtValid(self);
     }
 
     fn byrValid(self: *Passport) bool {
         const byr: u16 = std.fmt.parseUnsigned(u16, self.byr, 10) catch {
             return false;
         };
-        return 1920 <= byr <= 2002;
+        return (byr >= 1920) and (byr <= 2002);
     }
     fn iyrValid(self: *Passport) bool {
-        const iyr: u16 = std.fmt.parseUnsigned(u16, self.byr, 10) catch {
+        std.debug.print("HI{s}\n\n\n\n", .{self});
+        // return true;
+        const iyr: u16 = std.fmt.parseUnsigned(u16, self.iyr, 10) catch {
             return false;
         };
-        return 2010 <= iyr <= 2020;
+        return (iyr >= 2010) and (iyr <= 2020);
     }
     fn eyrValid(self: *Passport) bool {
         const eyr: u16 = std.fmt.parseUnsigned(u16, self.eyr, 10) catch {
             return false;
         };
-        return 2020 <= eyr <= 2030;
+        return (eyr >= 2020) and (eyr <= 2030);
     }
 
     fn hgtValid(self: *Passport) bool {
@@ -56,9 +57,9 @@ const Passport = struct {
 
         if (height) |unwrappedHeight| {
             if (isCM) {
-                return 150 < unwrappedHeight < 193;
+                return (unwrappedHeight >= 150 and unwrappedHeight <= 193);
             } else {
-                return 59 < unwrappedHeight < 76;
+                return (unwrappedHeight >= 59 and unwrappedHeight <= 76);
             }
         } else {
             return false;
@@ -84,6 +85,7 @@ const Passport = struct {
     fn eclValid(self: *Passport) bool {
         return std.mem.eql(u8, self.ecl, "amb") or std.mem.eql(u8, self.ecl, "blu") or std.mem.eql(u8, self.ecl, "gry") or std.mem.eql(u8, self.ecl, "grn") or std.mem.eql(u8, self.ecl, "hzl") or std.mem.eql(u8, self.ecl, "oth");
     }
+
     fn pidValid(self: *Passport) bool {
         return std.mem.len(self.pid) == 9;
     }
