@@ -37,14 +37,16 @@ const Passport = struct {
 
     fn hgtValid(self: *Passport) bool {
         var height: ?u16 = null;
-        var isCM = (std.mem.indexOf(u8, self.hgt, "cm") != null);
+        var isCM: bool = false;
         std.debug.print("isCM: {b}\n", .{isCM});
 
         if (std.mem.indexOf(u8, self.hgt, "cm")) |cmIndex| {
+            isCM = true;
             height = std.fmt.parseUnsigned(u16, self.hgt[0..cmIndex], 10) catch {
                 return false;
             };
         } else if (std.mem.indexOf(u8, self.hgt, "in")) |inIndex| {
+            isCM = false;
             height = std.fmt.parseUnsigned(u16, self.hgt[0..inIndex], 10) catch {
                 return false;
             };
@@ -70,9 +72,8 @@ const Passport = struct {
         }
         if (self.hcl[0] == '#') {
             for (self.hcl[1..7]) |char| {
-                var local = [1]u8{char};
-                if (std.mem.containsAtLeast(u8, "abcdef0123456789", 1, &local) == false) {
-                    std.debug.print("invalid {s}\n\n\n\n", .{&local});
+                if (std.mem.containsAtLeast(u8, "abcdef0123456789", 1, &.{char}) == false) {
+                    std.debug.print("invalid {s}\n\n\n\n", .{&char});
 
                     return false;
                 }
