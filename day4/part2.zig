@@ -3,24 +3,90 @@ const std = @import("std");
 const input = @embedFile("input.txt");
 
 const Passport = struct {
-    // byr: bool = true,
     byr: []const u8 = "",
-    iyr: bool = false,
-    eyr: bool = false,
-    hgt: bool = false,
-    hcl: bool = false,
-    ecl: bool = false,
-    pid: bool = false,
-    cid: bool = false,
+    iyr: []const u8 = "",
+    eyr: []const u8 = "",
+    hgt: []const u8 = "",
+    hcl: []const u8 = "",
+    ecl: []const u8 = "",
+    pid: []const u8 = "",
+    cid: []const u8 = "",
 
     fn isValid(self: *Passport) bool {
-        std.debug.print("Hi: {s}", .{self});
-        return true;
-        // return self.byr and self.iyr and self.eyr and self.hgt and self.hcl and self.ecl and self.pid;
+        return byrValid(self) and iyrValid(self) and eyrValid(self) and hgtValid(self) and hclValid(self) and eclValid(self) and pidValid(self);
+        // return hgtValid(self);
     }
-    // fn byrValid() bool {
-    //     return byr.
-    // }
+
+    fn byrValid(self: *Passport) bool {
+        const byr: u16 = std.fmt.parseUnsigned(u16, self.byr, 10) catch {
+            return false;
+        };
+        return 1920 <= byr <= 2002;
+    }
+    fn iyrValid(self: *Passport) bool {
+        const iyr: u16 = std.fmt.parseUnsigned(u16, self.byr, 10) catch {
+            return false;
+        };
+        return 2010 <= iyr <= 2020;
+    }
+    fn eyrValid(self: *Passport) bool {
+        const eyr: u16 = std.fmt.parseUnsigned(u16, self.eyr, 10) catch {
+            return false;
+        };
+        return 2020 <= eyr <= 2030;
+    }
+
+    fn hgtValid(self: *Passport) bool {
+        var height: ?u16 = null;
+        var isCM = (std.mem.indexOf(u8, self.hgt, "cm") != null);
+        std.debug.print("isCM: {b}\n", .{isCM});
+        std.debug.print("HI\n\n\n\n", .{});
+
+        if (std.mem.indexOf(u8, self.hgt, "cm")) |cmIndex| {
+            height = std.fmt.parseUnsigned(u16, self.hgt[0..cmIndex], 10) catch {
+                return false;
+            };
+        } else if (std.mem.indexOf(u8, self.hgt, "in")) |inIndex| {
+            height = std.fmt.parseUnsigned(u16, self.hgt[0..inIndex], 10) catch {
+                return false;
+            };
+        } else {
+            return false; // no cm or in
+        }
+
+        if (height) |unwrappedHeight| {
+            if (isCM) {
+                return 150 < unwrappedHeight < 193;
+            } else {
+                return 59 < unwrappedHeight < 76;
+            }
+        } else {
+            return false;
+        }
+    }
+
+    fn hclValid(self: *Passport) bool {
+        if (std.mem.len(self.hcl) != 7) {
+            return false;
+        }
+        if (self.hcl[0] == '#') {
+            for (self.hcl[1..7]) |char| {
+                var local = [1]u8{char};
+                if (std.mem.containsAtLeast(u8, "abcdef0123456789", 1, &local) == false) {
+                    return false;
+                }
+            }
+            return true;
+        }
+        return false;
+    }
+
+    fn eclValid(self: *Passport) bool {
+        return std.mem.eql(u8, self.ecl, "amb") or std.mem.eql(u8, self.ecl, "blu") or std.mem.eql(u8, self.ecl, "gry") or std.mem.eql(u8, self.ecl, "grn") or std.mem.eql(u8, self.ecl, "hzl") or std.mem.eql(u8, self.ecl, "oth");
+    }
+    fn pidValid(self: *Passport) bool {
+        return std.mem.len(self.pid) == 9;
+    }
 };
 
 pub fn main() !void {
@@ -29,7 +95,7 @@ pub fn main() !void {
 }
 
 fn part2() !void {
-    const fieldNames = [_][]const u8{ "byr", "iyr", "eyr", "hgt", "hcl", "ecl", "pid", "cid" };
+    // const fieldNames = [_][]const u8{ "byr", "iyr", "eyr", "hgt", "hcl", "ecl", "pid", "cid" };
 
     var validPassportCount: u16 = 0;
 
@@ -41,30 +107,21 @@ fn part2() !void {
         var lineIterator = std.mem.split(u8, passport, "\n");
 
         while (lineIterator.next()) |line| {
-            for (fieldNames) |fieldName| {
-                const fieldContents = parseField(fieldName, line);
-                // @field(currentPassport, "byr") = "Aa";
-                std.debug.print("{s}\n", .{fieldContents});
-            }
-            std.debug.print("{s}\n", .{line});
-            // currentPassport.byr = currentPassport.byr or std.mem.indexOf(u8, line, "byr") != null;
-            // currentPassport.byr = currentPassport.byr or std.mem.containsAtLeast(u8, line, 1, "byr");
-
-            currentPassport.iyr = currentPassport.iyr or std.mem.indexOf(u8, line, "iyr") != null;
-            currentPassport.eyr = currentPassport.eyr or std.mem.indexOf(u8, line, "eyr") != null;
-            currentPassport.hgt = currentPassport.hgt or std.mem.indexOf(u8, line, "hgt") != null;
-            currentPassport.hcl = currentPassport.hcl or std.mem.indexOf(u8, line, "hcl") != null;
-            currentPassport.ecl = currentPassport.ecl or std.mem.indexOf(u8, line, "ecl") != null;
-            currentPassport.pid = currentPassport.pid or std.mem.indexOf(u8, line, "pid") != null;
-            currentPassport.cid = currentPassport.cid or std.mem.indexOf(u8, line, "cid") != null;
+            currentPassport.byr = parseField("byr", line) orelse currentPassport.byr;
+            currentPassport.iyr = parseField("iyr", line) orelse currentPassport.iyr;
+            currentPassport.eyr = parseField("eyr", line) orelse currentPassport.eyr;
+            currentPassport.hgt = parseField("hgt", line) orelse currentPassport.hgt;
+            currentPassport.hcl = parseField("hcl", line) orelse currentPassport.hcl;
+            currentPassport.ecl = parseField("ecl", line) orelse currentPassport.ecl;
+            currentPassport.pid = parseField("pid", line) orelse currentPassport.pid;
+            currentPassport.cid = parseField("cid", line) orelse currentPassport.cid;
         }
         if (currentPassport.isValid()) {
             validPassportCount += 1;
         }
-        std.debug.print("isValid: {s}\n", .{currentPassport});
         std.debug.print("isValid: {b}\n", .{currentPassport.isValid()});
-        std.debug.print("--------------------\n\n", .{});
     }
+    std.debug.print("--------------------\n\n", .{});
     std.debug.print("Valid Passports: {d}\n\n", .{validPassportCount});
 }
 
@@ -75,26 +132,11 @@ fn parseField(name: []const u8, haystack: []const u8) ?[]const u8 {
     while (fieldIterator.next()) |field| {
         const fieldDelimeterIndex = std.mem.indexOf(u8, haystack, ":").? + 1;
         // TODO: Why doesn't this work? // if (field[0..fieldDelimeterIndex] == name) {
-        if (std.mem.eql(u8, field[0..fieldDelimeterIndex], name)) {
+        if (std.mem.eql(u8, field[0 .. fieldDelimeterIndex - 1], name)) {
             fieldValue = field[fieldDelimeterIndex..];
+            std.debug.print("{s} = {s}\n", .{ name, fieldValue });
         }
-        std.debug.print("Field Value: {s}\n", .{fieldValue});
     }
 
-    const fieldStartIndex = std.mem.indexOf(u8, haystack, name);
-    const fieldEndIndex = std.mem.lastIndexOf(u8, haystack, " ") orelse std.mem.indexOf(u8, haystack, "\n");
-    std.debug.print("Parsing line: {s}\n", .{haystack});
-    std.debug.print("Parsing fieldName: {s}\n", .{name});
-    std.debug.print("fieldStartIndex: {d}\n", .{fieldStartIndex});
-    std.debug.print("fieldEndIndex: {d}\n", .{fieldEndIndex});
-    if (fieldStartIndex == null or fieldEndIndex == null) {
-        return null;
-    }
-    // return haystack[fieldStartIndex.?..fieldEndIndex.?];
     return fieldValue;
-    // var lineIterator = std.mem.split(u8, haystack, "\n");
-
-    // while (lineIterator.next()) |line| {
-    //     return name + line;
-    // }
 }
